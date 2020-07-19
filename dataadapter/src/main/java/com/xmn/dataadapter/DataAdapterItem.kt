@@ -1,4 +1,4 @@
-package com.xmn.dataadapter.lib.dataadapter
+package com.xmn.dataadapter
 
 interface DataAdapterItem
 class DataItemsBuilder<T : DataAdapterItem> {

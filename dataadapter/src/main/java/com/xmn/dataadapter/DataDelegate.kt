@@ -1,8 +1,9 @@
-package com.xmn.dataadapter.lib.dataadapter
+package com.xmn.dataadapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.hannesdorfmann.adapterdelegates4.AdapterDelegate
+import java.lang.ClassCastException
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
@@ -25,18 +26,21 @@ class DataDelegate<T : Any>(val renderer: ViewDataRenderer<T>) :
     ) {
         val viewHolder = holder as ViewDataRenderer.ViewHolder
         val item = items[position]
-        renderer.apply { viewHolder.bind(item as T, payloads) }
+        renderer.apply { viewHolder.bind(item as T, payloads.firstOrNull() as? T) }
     }
 
     fun areItemsTheSame(
         oldItem: Any,
         newItem: Any
     ): Boolean =
-        if (!renderer.clazz().isInstance(newItem)) false else
-            (oldItem as? T)?.identify() ==
-                    (newItem as? T)?.identify()
+        try {
+            (oldItem as T).identify() ==
+                    (newItem as T).identify()
+        } catch (e: ClassCastException) {
+            false
+        }
 
-    private fun T.identify(): Any = renderer.apply { identify() }
+    private fun T.identify(): Any = renderer.run { identify() }
 
     fun clazz(): KClass<T> {
         return renderer.clazz()
@@ -50,7 +54,7 @@ abstract class UniqueDelegate<T : Any> : ViewDataRenderer<T>() {
 abstract class StaticDelegate<T : Any> : UniqueDelegate<T>() {
     override fun ViewHolder.bind(
         item: T,
-        payloads: MutableList<Any>
+        oldItem: T?
     ) {
     }
 }

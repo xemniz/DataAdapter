@@ -1,15 +1,17 @@
-package com.xmn.dataadapter.lib.dataadapter
+package com.xmn.dataadapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hannesdorfmann.adapterdelegates4.AdapterDelegate
 import com.hannesdorfmann.adapterdelegates4.AdapterDelegatesManager
-import kotlinx.coroutines.runBlocking
+import kotlin.reflect.KClass
 
 class DataAdapter(private val delegates: List<DataDelegate<*>>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -30,7 +32,7 @@ class DataAdapter(private val delegates: List<DataDelegate<*>>) :
                 oldItem: Any,
                 newItem: Any
             ): Boolean {
-                val delegate = delegatesManager.delegateFor(oldItem)
+                val delegate = delegatesManager.delegateFor(newItem)
                 return delegate?.areItemsTheSame(oldItem, newItem) ?: false
             }
 
@@ -46,17 +48,11 @@ class DataAdapter(private val delegates: List<DataDelegate<*>>) :
                 oldItem: Any,
                 newItem: Any
             ): Any? {
-                return oldItem to newItem
+                return oldItem
             }
         }
         this.differ = AsyncListDiffer(this, diffCallback)
         this.delegatesManager = delegatesManager
-    }
-
-    fun setItemsSynchronously(items: List<Any>) {
-        runBlocking {
-            differ.submitListSync(items)
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -104,16 +100,23 @@ class DataAdapter(private val delegates: List<DataDelegate<*>>) :
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
+
+    companion object {
+        fun from(renderers: List<ViewDataRenderer<*>>) =
+            DataAdapter(renderers.map { DataDelegate(it) })
+    }
 }
 
 class DataDelegatesManager : AdapterDelegatesManager<List<Any>>() {
+    private val delegatesMap: MutableMap<KClass<*>, DataDelegate<*>> = mutableMapOf()
+
     fun delegateFor(oldItem: Any): DataDelegate<*>? {
-        for (i in 0 until delegates.size()) {
-            val delegate = delegates.get(i) as DataDelegate<*>
-            if (delegate.run { delegate.clazz().isInstance(oldItem) })
-                return delegate
-        }
-        return null
+        return delegatesMap[oldItem::class]
+    }
+
+    override fun addDelegate(delegate: AdapterDelegate<List<Any>>): AdapterDelegatesManager<List<Any>> {
+        delegatesMap[(delegate as DataDelegate<*>).clazz()] = delegate
+        return super.addDelegate(delegate)
     }
 }
 
@@ -144,12 +147,6 @@ var RecyclerView.dataAdapterItems
     get() = (adapter as DataAdapter).items
     set(items) {
         (adapter as DataAdapter).items = items
-    }
-
-var RecyclerView.dataAdapterItemsSync
-    get() = (adapter as DataAdapter).items
-    set(items) {
-        (adapter as DataAdapter).setItemsSynchronously(items)
     }
 
 class DataDelegatesBuilder {

@@ -1,4 +1,4 @@
-package com.xmn.dataadapter.lib.dataadapter
+package com.xmn.dataadapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -13,18 +13,10 @@ abstract class ViewDataRenderer<T : Any> {
     abstract fun ViewGroup.view(): View
     abstract fun ViewHolder.bind(
         item: T,
-        payloads: MutableList<Any>
+        oldItem: T?
     )
 
     abstract fun T.identify(): Any
-
-    fun areItemsTheSame(
-        oldItem: Any,
-        newItem: Any
-    ): Boolean =
-        if (!clazz().isInstance(newItem)) false else
-            (oldItem as? T)?.let { it.identify() } ==
-                    (newItem as? T)?.let { it.identify() }
 
     class ViewHolder(val containerView: View) :
         RecyclerView.ViewHolder(containerView) {

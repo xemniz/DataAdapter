@@ -1,4 +1,4 @@
-package com.xmn.dataadapter.lib.dataadapter
+package com.xmn.dataadapter
 
 import android.content.Context
 import android.view.View
@@ -38,9 +38,9 @@ inline fun <reified State : Any, DV> dataViewDelegate(
 
     override fun ViewHolder.bind(
         item: State,
-        payloads: MutableList<Any>
+        oldItem: State?
     ) {
-        containerView.tag = payloads.firstOrNull()
+        containerView.tag = oldItem
         @Suppress("UNCHECKED_CAST")
         (containerView as DV).render(item)
     }
