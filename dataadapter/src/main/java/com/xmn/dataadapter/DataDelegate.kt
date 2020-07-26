@@ -7,7 +7,7 @@ import java.lang.ClassCastException
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
-class DataDelegate<T : Any>(val renderer: ViewDataRenderer<T>) :
+class DataDelegate<T : Any>(private val renderer: ViewDataRenderer<T>) :
     AdapterDelegate<List<Any>>() {
     public override fun onCreateViewHolder(parent: ViewGroup): ViewDataRenderer.ViewHolder {
         return ViewDataRenderer.ViewHolder(renderer.run { parent.view() })
@@ -48,7 +48,7 @@ class DataDelegate<T : Any>(val renderer: ViewDataRenderer<T>) :
 }
 
 abstract class UniqueDelegate<T : Any> : ViewDataRenderer<T>() {
-    override fun T.identify(): Any = this@UniqueDelegate
+    override fun T.identify(): Any = this
 }
 
 abstract class StaticDelegate<T : Any> : UniqueDelegate<T>() {

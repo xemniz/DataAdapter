@@ -3,6 +3,7 @@ package com.xmn.dataadapter.example.delegates
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.TextView
+import com.xmn.dataadapter.StaticDelegate
 import com.xmn.dataadapter.ViewDataRenderer
 import com.xmn.dataadapter.example.R
 import com.xmn.dataadapter.inflate
@@ -12,6 +13,7 @@ data class GreenTextViewData(val id: String, val string: String)
 data class RedTextViewData(val id: String, val string: String)
 data class BlueTextViewData(val id: String, val string: String)
 data class YellowTextViewData(val id: String, val string: String)
+class Loading
 
 class TextRendererGreen : ViewDataRenderer<GreenTextViewData>() {
     override fun clazz(): KClass<GreenTextViewData> = GreenTextViewData::class
@@ -75,4 +77,10 @@ class TextRendererYellow : ViewDataRenderer<YellowTextViewData>() {
         containerView.findViewById<TextView>(R.id.textView).text = item.string
         containerView.findViewById<TextView>(R.id.textView).setBackgroundColor(Color.YELLOW)
     }
+}
+
+class LoadingRenderer : StaticDelegate<Loading>() {
+    override fun clazz(): KClass<Loading> = Loading::class
+
+    override fun ViewGroup.view() = inflate(R.layout.item_loading)
 }

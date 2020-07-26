@@ -17,7 +17,7 @@ class DataAdapter(private val delegates: List<DataDelegate<*>>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val delegatesManager: AdapterDelegatesManager<List<Any>>
-    private val differ: AsyncListDiffer<Any>
+    val differ: AsyncListDiffer<Any>
 
     var items: List<Any>
         get() = differ.currentList

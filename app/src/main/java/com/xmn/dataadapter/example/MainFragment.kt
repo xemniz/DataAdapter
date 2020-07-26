@@ -23,5 +23,9 @@ class MainFragment : Fragment() {
         view.findViewById<Button>(R.id.button_heterogenous_list).setOnClickListener {
             findNavController().navigate(R.id.HeterogenousListFragment)
         }
+
+        view.findViewById<Button>(R.id.button_pagination_heterogenous_list).setOnClickListener {
+            findNavController().navigate(R.id.paginationHeterogeneousListFragment)
+        }
     }
 }

@@ -18,5 +18,12 @@
         <action
             android:id="@+id/action_MainFragment_to_HeterogenousListFragment"
             app:destination="@id/HeterogenousListFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_paginationHeterogeneousListFragment"
+            app:destination="@id/paginationHeterogeneousListFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/paginationHeterogeneousListFragment"
+        android:name="com.xmn.dataadapter.example.PaginationHeterogeneousListFragment"
+        android:label="PaginationHeterogeneousListFragment" />
 </navigation>
